@@ -44,5 +44,5 @@ def displayloop():
             GPIO.output("P9_11", GPIO.HIGH)
             GPIO.output("P9_12", GPIO.LOW)
             GPIO.output("P9_13", GPIO.HIGH)
-        else:  time.sleep (.5)
+        time.sleep (.5)
 displayloop()

@@ -1,0 +1,145 @@
+pcm.!default {
+     type plug
+     slave.pcm filter
+}
+ctl.!default {
+     type hw
+     card 0
+}
+pcm.filter {
+     type ladspa
+     slave.pcm eq
+     path "/usr/lib/ladspa"
+     channels 4
+     plugins
+     {
+          0 {
+               label RTlr4lowpass
+               policy none
+               input.bindings.0 "Input"
+               output.bindings.2 "Output"
+               input { controls [ 440 ] }   # low left [ frequency (-6 dB XO point)]
+          }
+          1 {
+               label RTlr4hipass
+               policy none
+               input.bindings.0 "Input"
+               output.bindings.0 "Output"
+               input { controls [ 440 ] }   # high left (match freq above)
+          }
+        2 {
+               label RTlr4lowpass
+               policy none
+               input.bindings.1 "Input"
+               output.bindings.3 "Output"
+               input { controls [ 440 ] }   # low right
+          }
+        3 {
+               label RTlr4hipass
+               policy none
+               input.bindings.1 "Input"
+               output.bindings.1 "Output"
+               input { controls [ 440 ] }   # high right
+          }
+     }
+}
+pcm.eq {
+     type ladspa
+     slave.pcm  delay
+     path "/usr/lib/ladspa"
+     channels 4
+     plugins
+     {
+        0 {
+               label RTparaeq
+               policy none
+               input.bindings.0 "Input"
+               output.bindings.0 "Output"
+               input { controls [ 0 4800 2.0 ] }   # high left [ delta dB, frequency, Q ]
+          }
+        1 {
+               label RTparaeq
+               policy none
+               input.bindings.1 "Input"
+               output.bindings.1 "Output"
+               input { controls [ 0 4800 2.0 ] }   # high right
+          }
+        2 {
+               label RTparaeq
+               policy none
+               input.bindings.2 "Input"
+               output.bindings.2 "Output"
+               input { controls [ 0 30 0.7 ] }   # low right [ delta dB, frequency, Q ]
+          }
+        3 {
+               label RTparaeq
+               policy none
+               input.bindings.3 "Input"
+               output.bindings.3 "Output"
+               input { controls [ 0 30 0.7 ] }   # low left
+          }
+            }
+}
+
+pcm.delay {
+     type ladspa
+     slave.pcm  speaker
+     path "/usr/lib/ladspa" 
+     channels 4
+     plugins
+     {
+        0 {
+               label delay_5s
+               policy none
+               input.bindings.0 "Input"
+               output.bindings.0 "Output"
+               input { controls [ 0.0 0 ] }    # high left [delay in seconds, wet/dry (0=all input, 1=all output)]
+          }
+        1 {
+               label delay_5s
+               policy none
+               input.bindings.1 "Input"
+               output.bindings.1 "Output"
+               input { controls [ 0.0 0 ] }    # high right
+          }
+        2 {
+               label delay_5s
+               policy none
+               input.bindings.2 "Input"
+               output.bindings.2 "Output"
+               input { controls [ 0.0 0 ] }    # low left
+          }
+        3 {
+               label delay_5s
+               policy none
+               input.bindings.3 "Input"
+               output.bindings.3 "Output"
+               input { controls [ 0.0 0 ] }    # low right
+          }
+     }
+}
+
+ pcm.speaker {
+    type plug
+    slave {
+     pcm "t-table"
+     channels 4
+     rate "unchanged"
+    }
+}
+pcm.t-table  {
+    type route
+    slave {
+     pcm "hw:0,0"
+     channels 4
+    }
+    ttable {
+      0.0   1      
+      1.2   1
+      2.1   1
+      3.3   1
+    }
+}
+
+pcm.plughw.slave.rate = "unchanged";
+

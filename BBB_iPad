@@ -1,0 +1,464 @@
+{
+	"name": "BBB iPad",
+	"connections": [
+		{
+			"host": "10.0.1.19",
+			"name": "BBB",
+			"port": 8192
+		}
+	],
+	"version": 2,
+	"theme": "dark",
+	"type": "NetIOConfiguration",
+	"pages": [
+		{
+			"fitToScreen": true,
+			"items": [
+				{
+					"sends": [
+						"BBB_in"
+					],
+					"top": 150,
+					"label": "BBB",
+					"height": 160,
+					"width": 120,
+					"shape": "rounded",
+					"icon": "",
+					"type": "button",
+					"left": 80,
+					"textcolor": "0,183,250",
+					"background": "31,56,81",
+					"border": "0,150,250",
+					"fontsize": 20
+				},
+				{
+					"sends": [
+						"AppleTV_in"
+					],
+					"top": 370,
+					"label": "Apple TV",
+					"height": 160,
+					"width": 120,
+					"shape": "rounded",
+					"icon": "",
+					"type": "button",
+					"left": 80,
+					"textcolor": "0,183,250",
+					"background": "31,56,81",
+					"border": "0,150,250",
+					"fontsize": 20
+				},
+				{
+					"top": 90,
+					"left": 90,
+					"width": 100,
+					"height": 50,
+					"type": "label",
+					"text": "INPUT",
+					"fontsize": 22
+				},
+				{
+					"sends": [
+						"toggle mute",
+						"__wait 100"
+					],
+					"top": 590,
+					"height": 160,
+					"width": 210,
+					"shape": "rounded",
+					"type": "button",
+					"left": 250,
+					"textcolor": "167,0,0",
+					"background": "170,170,170",
+					"border": "255,122,122",
+					"fontsize": 28,
+					"reads": "mute on",
+					"parseResponse": ".*$",
+					"label": "",
+					"requiresSendReponse": true
+				},
+				{
+					"sends": [
+						"SonyTV_in"
+					],
+					"top": 590,
+					"label": "Sony TV",
+					"height": 160,
+					"width": 120,
+					"shape": "rounded",
+					"icon": "",
+					"type": "button",
+					"left": 80,
+					"textcolor": "0,183,250",
+					"background": "31,56,81",
+					"border": "0,150,250",
+					"fontsize": 20
+				},
+				{
+					"sends": [
+						"speakers"
+					],
+					"top": 150,
+					"label": "Speakers",
+					"height": 160,
+					"width": 120,
+					"shape": "rounded",
+					"icon": "",
+					"type": "button",
+					"left": 290,
+					"textcolor": "42,250,0",
+					"background": "53,65,51",
+					"border": "34,255,0",
+					"fontsize": 20
+				},
+				{
+					"sends": [
+						"phones"
+					],
+					"top": 370,
+					"label": "Headphones",
+					"height": 160,
+					"width": 120,
+					"shape": "rounded",
+					"icon": "",
+					"type": "button",
+					"left": 290,
+					"textcolor": "42,250,0",
+					"background": "53,65,51",
+					"border": "34,255,0",
+					"fontsize": 18
+				},
+				{
+					"top": 90,
+					"left": 300,
+					"width": 100,
+					"height": 50,
+					"type": "label",
+					"text": "OUTPUT",
+					"fontsize": 22
+				},
+				{
+					"top": 900,
+					"left": 340,
+					"width": 100,
+					"height": 50,
+					"type": "label",
+					"text": "VOLUME",
+					"fontsize": 22
+				},
+				{
+					"top": 830,
+					"left": 60,
+					"width": 650,
+					"height": 60,
+					"type": "slider",
+					"minValue": 0,
+					"maxValue": 127,
+					"showValue": false,
+					"lowColor": "200,200,200",
+					"highColor": "240,240,240",
+					"knobColor": "201,117,117",
+					"textcolor": "255,0,0",
+					"sends": "set it to {value}",
+					"step": 1
+				},
+				{
+					"top": 900,
+					"left": 50,
+					"width": 60,
+					"height": 30,
+					"type": "label",
+					"text": "-64 dB",
+					"textcolor": "230,230,230"
+				},
+				{
+					"top": 900,
+					"left": 670,
+					"width": 50,
+					"height": 30,
+					"type": "label",
+					"text": "0 dB",
+					"textcolor": "230,230,230"
+				},
+				{
+					"top": 620,
+					"left": 500,
+					"width": 210,
+					"height": 170,
+					"type": "gauge",
+					"angle": "160",
+					"minValue": 0,
+					"maxValue": 192,
+					"reads": "get freq",
+					"arcColor": "210,210,210",
+					"needleWidth": "13",
+					"arcWidth": "10",
+					"needleColor": "210,63,63",
+					"background": "86,86,86",
+					"parseResponse": "\\d+"
+				},
+				{
+					"top": 680,
+					"left": 490,
+					"width": 60,
+					"height": 50,
+					"type": "label",
+					"text": "0 kHz",
+					"textcolor": "255,255,255",
+					"fontsize": 12
+				},
+				{
+					"top": 680,
+					"left": 660,
+					"width": 60,
+					"height": 50,
+					"type": "label",
+					"text": "192 kHz",
+					"textcolor": "255,255,255",
+					"fontsize": 12
+				},
+				{
+					"top": 550,
+					"left": 540,
+					"width": 125,
+					"height": 45,
+					"type": "label",
+					"text": "SOURCE  FREQUENCY",
+					"textcolor": "255,166,166",
+					"fontsize": 16
+				},
+				{
+					"top": 40,
+					"left": 170,
+					"width": 445,
+					"height": 45,
+					"type": "label",
+					"text": "AUDIO SYSTEM CONTROLLER",
+					"fontsize": 28,
+					"textcolor": "230,138,138"
+				},
+				{
+					"top": 135,
+					"left": 710,
+					"width": 35,
+					"height": 70,
+					"type": "label",
+					"text": "dB/2",
+					"textcolor": "230,230,230",
+					"fontsize": 11
+				},
+				{
+					"top": 225,
+					"left": 710,
+					"width": 30,
+					"height": 65,
+					"type": "label",
+					"text": "dB/2",
+					"textcolor": "230,230,230",
+					"fontsize": 11
+				},
+				{
+					"top": 90,
+					"left": 530,
+					"width": 100,
+					"height": 50,
+					"type": "label",
+					"text": "TRIM",
+					"fontsize": 18
+				},
+				{
+					"top": 155,
+					"left": 535,
+					"width": 100,
+					"height": 100,
+					"type": "label",
+					"text": "TWEETERS",
+					"textcolor": "255,255,255",
+					"fontsize": 14
+				},
+				{
+					"top": 245,
+					"left": 535,
+					"width": 100,
+					"height": 100,
+					"type": "label",
+					"text": "MIDRANGE",
+					"textcolor": "255,255,255",
+					"fontsize": 14
+				},
+				{
+					"top": 335,
+					"left": 535,
+					"width": 100,
+					"height": 100,
+					"type": "label",
+					"text": "WOOFERS",
+					"textcolor": "255,255,255",
+					"fontsize": 14
+				},
+				{
+					"top": 445,
+					"left": 525,
+					"width": 125,
+					"height": 100,
+					"type": "label",
+					"text": "L  -  BALANCE  -  R",
+					"textcolor": "255,255,255",
+					"fontsize": 14
+				},
+				{
+					"top": 315,
+					"left": 710,
+					"width": 30,
+					"height": 65,
+					"type": "label",
+					"text": "dB/2",
+					"textcolor": "230,230,230",
+					"fontsize": 11
+				},
+				{
+					"top": 600,
+					"left": 515,
+					"width": 60,
+					"height": 50,
+					"type": "label",
+					"text": "48",
+					"textcolor": "255,255,255",
+					"fontsize": 12
+				},
+				{
+					"top": 585,
+					"left": 575,
+					"width": 50,
+					"height": 50,
+					"type": "label",
+					"text": "88 96",
+					"textcolor": "255,255,255",
+					"fontsize": 12
+				},
+				{
+					"top": 645,
+					"left": 665,
+					"width": 60,
+					"height": 50,
+					"type": "label",
+					"text": "176",
+					"textcolor": "255,255,255",
+					"fontsize": 12
+				},
+				{
+					"top": 440,
+					"left": 470,
+					"width": 265,
+					"height": 40,
+					"type": "slider",
+					"minValue": -12,
+					"maxValue": 12,
+					"showValue": true,
+					"lowColor": "200,200,200",
+					"highColor": "200,200,200",
+					"knobColor": "201,117,117",
+					"textcolor": "255,0,0",
+					"sends": "balance {value}",
+					"step": 1
+				},
+				{
+					"top": 330,
+					"left": 500,
+					"width": 210,
+					"height": 40,
+					"type": "slider",
+					"minValue": -12,
+					"maxValue": 0,
+					"showValue": true,
+					"lowColor": "200,200,200",
+					"highColor": "200,200,200",
+					"knobColor": "201,117,117",
+					"textcolor": "255,0,0",
+					"sends": "woofer {value}",
+					"step": 1
+				},
+				{
+					"top": 240,
+					"left": 500,
+					"width": 210,
+					"height": 40,
+					"type": "slider",
+					"minValue": -12,
+					"maxValue": 0,
+					"showValue": true,
+					"lowColor": "200,200,200",
+					"highColor": "200,200,200",
+					"knobColor": "201,117,117",
+					"textcolor": "255,0,0",
+					"sends": "midrange {value}",
+					"step": 1
+				},
+				{
+					"top": 150,
+					"left": 500,
+					"width": 210,
+					"height": 40,
+					"type": "slider",
+					"minValue": -12,
+					"maxValue": 0,
+					"showValue": true,
+					"lowColor": "200,200,200",
+					"highColor": "200,200,200",
+					"knobColor": "201,117,117",
+					"textcolor": "255,0,0",
+					"sends": "tweeter {value}",
+					"step": 1
+				},
+				{
+					"top": 425,
+					"left": 735,
+					"width": 30,
+					"height": 65,
+					"type": "label",
+					"text": "dB/2",
+					"textcolor": "230,230,230",
+					"fontsize": 11
+				},
+				{
+					"top": 615,
+					"left": 515,
+					"width": 40,
+					"height": 50,
+					"type": "label",
+					"text": "44",
+					"textcolor": "255,255,255",
+					"fontsize": 12
+				},
+				{
+					"top": 685,
+					"left": 555,
+					"width": 100,
+					"height": 100,
+					"type": "label",
+					"textcolor": "230,230,230",
+					"reads": "get freq",
+					"text": "",
+					"parseResponse": ".*$",
+					"fontsize": 20
+				}
+			],
+			"connection": "BBB",
+			"name": "io",
+			"label": "BBB I/O",
+			"width": 770,
+			"height": 1000,
+			"textcolor": "230,230,230",
+			"background": "40,40,40"
+		}
+	],
+	"description": "IO Demo configuration",
+	"device": "iPhone",
+	"orientation": "portrait",
+	"navigation": "fix",
+	"pagebuttonwidth": "static",
+	"style": "flat",
+	"navBackground": "30,30,30",
+	"preventSleep": false,
+	"switchOnSwipe": true
+}

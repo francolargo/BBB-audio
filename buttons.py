@@ -28,31 +28,30 @@ GPIO.setup("P8_17", GPIO.OUT)
 GPIO.output("P8_17", GPIO.LOW)
 GPIO.setup("P8_19", GPIO.OUT)
 GPIO.output("P8_19", GPIO.LOW)
-subprocess.call("./BBB_in.sh")
-subprocess.call("./Speaker_out.sh")
-subprocess.call("./netio_server.py")
+#subprocess.call("./BBB_in.sh")
+#subprocess.call("./Speaker_out.sh")
 def buttonloop():
     while True:
         if GPIO.event_detected("P8_11"):
-            subprocess.call("./S_kill.sh", shell=True)
-            subprocess.call("./Speaker_out.sh", shell=True)
+            subprocess.call("./usr/script/S_kill.sh", shell=True)
+            subprocess.call("./usr/script/Speaker_out.sh", shell=True)
             time.sleep(1)
         elif GPIO.event_detected("P8_12"):
-            subprocess.call("./S_kill.sh", shell=True)
-            subprocess.call("./Phone_out.sh", shell=True)
+            subprocess.call("./usr/script/S_kill.sh", shell=True)
+            subprocess.call("./usr/script/Phone_out.sh", shell=True)
             time.sleep(1)
         elif GPIO.event_detected("P8_14"):
             GPIO.output("P8_7", GPIO.HIGH)
             GPIO.output("P8_9", GPIO.HIGH) # move to bash script - echo
-            subprocess.call("./SonyTV_in.sh", shell=True)
+            subprocess.call("./usr/script/SonyTV_in.sh", shell=True)
             time.sleep(1)
         elif GPIO.event_detected("P8_16"):
             GPIO.output("P8_9", GPIO.LOW)
             GPIO.output("P8_7", GPIO.HIGH)
-            subprocess.call("./AppleTV_in.sh", shell=True)
+            subprocess.call("./usr/script/AppleTV_in.sh", shell=True)
             time.sleep(1)
         elif GPIO.event_detected("P8_18"):
-            subprocess.call("./BBB_in.sh", shell=True)
+            subprocess.call("./usr/script/BBB_in.sh", shell=True)
             time.sleep(1)
         time.sleep(.4)
 buttonloop()

@@ -28,8 +28,6 @@ GPIO.setup("P8_17", GPIO.OUT)
 GPIO.output("P8_17", GPIO.LOW)
 GPIO.setup("P8_19", GPIO.OUT)
 GPIO.output("P8_19", GPIO.LOW)
-#subprocess.call("./BBB_in.sh")
-#subprocess.call("./Speaker_out.sh")
 def buttonloop():
     while True:
         if GPIO.event_detected("P8_11"):

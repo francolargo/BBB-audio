@@ -1,0 +1,124 @@
+pcm.!default {
+     type plug
+     slave.pcm filter1
+}
+ctl.!default {
+     type hw
+     card 0
+}
+pcm.filter1 {
+     type ladspa
+     slave.pcm speaker
+     path "/usr/lib/ladspa"    
+     channels 8
+     plugins
+     {
+          0 {
+               label RTlr4lowpass
+               policy none
+               input.bindings.0 "Input"
+               output.bindings.2 "Output"
+               input { controls [ 200 ] }   # [frequency (Hz)]
+          }
+          1 {
+               id 9007
+               policy none
+               input.bindings.0 "Input"
+               output.bindings.4 "Output"
+               input { controls [ 4200 ] }
+          }
+        2 {
+               label RTlr4lowpass
+               policy none
+               input.bindings.1 "Input"
+               output.bindings.3 "Output"
+               input { controls [ 200 ] }
+          }
+        3 {
+               id 9007
+               policy none
+               input.bindings.1 "Input"
+               output.bindings.5 "Output"
+               input { controls [ 4200 ] }
+          }
+        4 {
+               label RTlr4hipass
+               policy none
+               input.bindings.0 "Input"
+               output.bindings.0 "Output"
+               input { controls [ 200 ] }
+          }
+        5 {
+               label RTlr4hipass
+               policy none
+               input.bindings.1 "Input"
+               output.bindings.1 "Output"
+               input { controls [ 200 ] }
+          }
+        6 {
+               id 9006
+               policy none
+               input.bindings.0"Input"
+               output.bindings.6 "Output"
+               input { controls [ 4200 ] }
+          }
+        7 {
+               id 9006
+               policy none
+               input.bindings.1 "Input"
+               output.bindings.7 "Output"
+               input { controls [ 4200 ] }
+          }
+
+     }
+}
+pcm.delay {
+     type ladspa
+     slave.pcm  speaker
+     path "/usr/lib/ladspa" 
+     channels 8
+     plugins
+     {
+        0 {
+               label delay_5s
+               policy none
+               input.bindings.2 "Input"
+               output.bindings.2 "Output"
+               input { controls [ 0.012 1 ] }    # [delay in seconds, wet/dry (0=all input, 1=all output)]
+          }
+        1 {
+               label delay_5s
+               policy none
+               input.bindings.3 "Input"
+               output.bindings.3 "Output"
+               input { controls [ 0.012 1 ] }
+          }
+     }
+}
+pcm.speaker {
+    type plug
+    slave {
+     pcm "t-table"  
+     channels 8
+     rate "unchanged"
+    }
+}
+pcm.t-table  {
+    type route
+    slave {
+     pcm "hw:0,0"
+     channels 8
+    }
+    ttable {
+      0.7   0
+      1.3   0   
+      7.4   1  #right mid
+      2.1   1  #left bass
+      3.5   1  #right bass
+      4.2   1  #left tweeter
+      5.6   1  #right tweeter
+      6.0   1  #left mid
+    }
+}
+
+pcm.plughw.slave.rate = "unchanged";

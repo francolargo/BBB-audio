@@ -7,10 +7,9 @@ import Adafruit_BBIO.GPIO as GPIO
 import time
 import subprocess
 import smbus
-#import os
-
+import os
 # misc. GPIO setup as needed to address pins
-GPIO.setup("P8_7", GPIO.OUT) # goes to Otto S input
+GPIO.setup("P8_7", GPIO.OUT)
 GPIO.output("P8_7", GPIO.LOW)
 GPIO.setup("P8_11", GPIO.IN)
 GPIO.add_event_detect("P8_11", GPIO.RISING)
@@ -22,10 +21,10 @@ GPIO.setup("P8_16", GPIO.IN)
 GPIO.add_event_detect("P8_16", GPIO.RISING)
 GPIO.setup("P8_18", GPIO.IN)
 GPIO.add_event_detect("P8_18", GPIO.RISING)
-GPIO.setup("P8_9", GPIO.OUT) # goes to Otto OE input
+GPIO.setup("P8_9", GPIO.OUT)
 GPIO.output("P8_9", GPIO.HIGH)
 GPIO.setup("P8_10", GPIO.OUT)
-GPIO.output("P8_10", GPIO.LOW)
+GPIO.output("P8_10", GPIO.HIGH)
 GPIO.setup("P8_13", GPIO.OUT)
 GPIO.output("P8_13", GPIO.LOW)
 GPIO.setup("P8_15", GPIO.OUT)
@@ -33,16 +32,18 @@ GPIO.output("P8_15", GPIO.LOW)
 GPIO.setup("P8_17", GPIO.OUT)
 GPIO.output("P8_17", GPIO.LOW)
 GPIO.setup("P8_19", GPIO.OUT)
-GPIO.output("P8_19", GPIO.LOW)
+GPIO.output("P8_19", GPIO.HIGH)
 # initialize for BBB -> speakers
-subprocess.call("./BBB_in.sh")
-subprocess.call("./Speaker_out.sh")
+os.chdir("/usr/script")
+os.system("pkill -f squeezelite")
+os.system("pkill -f sox")
+os.system("squeezelite -z -C 1 -o default -a 8192:2048::0")
+time.sleep(1)
 # volume & setup
-#SWITCH1 = "P8_18"
 LIGHT = 0
 volume = 10
-tweeter = 0
-midrange = 0
+tweeter = 30
+midrange = 40
 woofer = 0
 rate = 0
 rawrate = 0
@@ -94,33 +95,156 @@ class Client(asyncore.dispatcher_with_send):
         global volume
         global rate
         global mutebus
+        global PIN13
+        global PIN19
+        def mute():
+            bus.write_byte_data(0x70, 0x40, 0x06)
+            bus.write_byte_data(0x48, 0x17, 0xcf)
+            bus.write_byte_data(0x70, 0x40, 0x05)
+            bus.write_byte_data(0x48, 0x17, 0xcf)
+            bus.write_byte_data(0x70, 0x40, 0x04)
+            bus.write_byte_data(0x48, 0x17, 0xcf)
+
+        def unmute():
+            bus.write_byte_data(0x70, 0x40, 0x06)
+            bus.write_byte_data(0x48, 0x17, 0xce)
+            bus.write_byte_data(0x48, 0x17, set6)
+            bus.write_byte_data(0x70, 0x40, 0x05)
+            bus.write_byte_data(0x48, 0x17, 0xce)
+            bus.write_byte_data(0x48, 0x17, set5)
+            bus.write_byte_data(0x70, 0x40, 0x04)
+            bus.write_byte_data(0x48, 0x17, 0xce)
+            bus.write_byte_data(0x48, 0x17, set4)
+
         if line == 'BBB_in':
             self.send('BBB_in\n')
-            subprocess.call(". ./BBB_in.sh", shell=True)
-            bus.write_byte_data(0x70, 0x04, 0x06)
-            bus.write_byte_data(0x48, 0x17, 10)
-            bus.write_byte_data(0x70, 0x04, 0x05)
-            bus.write_byte_data(0x48, 0x17, 10)
-            bus.write_byte_data(0x70, 0x04, 0x04)
-            bus.write_byte_data(0x48, 0x17, 10)
+            GPIO.output("P8_15", GPIO.LOW)  # SonyTV
+            GPIO.output("P8_17", GPIO.LOW)  # AppleTV
+            GPIO.output("P8_19", GPIO.HIGH)  # BBB
+            mute()
+            time.sleep(.5)
+            os.system("pkill -f squeezelite")
+            os.system("pkill -f sox")
+            GPIO.output("P8_9", GPIO.HIGH)  # Otto off
+            with open('/sys/class/gpio/gpio23/value') as f:
+                 lines = f.readlines()
+            try:
+                 PIN13 = int(lines[0])
+            except IndexError:
+                 PIN13 = 0
+            print(PIN13)
+            if PIN13 == 1:
+               os.system("squeezelite -z -C 1 -o hw:0,0 -a 8192:2048::0")
+            else:
+               os.system("squeezelite -z -C 1 -o default -a 8192:2048::0")
+            time.sleep(1)
+            set6 = volume + int(midrange * volume / 100)
+            set5 = volume + int(woofer * volume / 100)
+            set4 = volume + int(tweeter * volume / 100)
+            unmute()
         elif line == 'speakers':
             self.send('speakers_out\n')
-            subprocess.call(". ./Speaker_out.sh", shell=True)
+            GPIO.output("P8_10", GPIO.HIGH)  # Speaker LED
+            GPIO.output("P8_13", GPIO.LOW)  # Headphone LED
+            mute()
+            time.sleep(.5)
+            os.system("pkill -f squeezelite")
+            os.system("pkill -f sox")
+            with open('/sys/class/gpio/gpio22/value') as f:
+                 lines = f.readlines()
+            try:
+                 PIN19 = int(lines[0])
+            except IndexError:
+                 PIN19 = 0
+            print(PIN19)
+            if PIN19 == 1:
+               os.system("squeezelite -z -C 1 -o default -a 8192:2048::0")
+               time.sleep(1)
+            else:
+               os.system("chrt -f 45 sox --buffer 512  -c 2 -t alsa hw:1,0 -t alsa plug:TV-in &")
+            set6 = volume + int(midrange * volume / 100)
+            set5 = volume + int(woofer * volume / 100)
+            set4 = volume + int(tweeter * volume / 100)
+            unmute()
         elif line == 'phones':
             self.send('phones_out\n')
-            subprocess.call(". ./Phone_out.sh", shell=True)
+            GPIO.output("P8_10", GPIO.LOW)  # Speaker LED
+            GPIO.output("P8_13", GPIO.HIGH)  # Headphone LED
+            mute()
+            time.sleep(.5)
+            os.system("pkill -f squeezelite")
+            os.system("pkill -f sox")
+            with open('/sys/class/gpio/gpio22/value') as f:
+                 lines = f.readlines()
+            try:
+                 PIN19 = int(lines[0])
+            except IndexError:
+                 PIN19 = 0
+            print(PIN19)
+            if PIN19 == 1:
+               os.system("squeezelite -z -C 1 -o hw:0,0 -a 8192:2048::0")
+               time.sleep(1)
+            else:
+               os.system("chrt -f 45 sox --buffer 512  -c 2 -t alsa hw:1,0 -t alsa plug:TV-inhw &")
+            set6 = volume + int(midrange * volume / 100)
+            set5 = volume + int(woofer * volume / 100)
+            set4 = volume + int(tweeter * volume / 100)
+            unmute()
         elif line == 'AppleTV_in':
             self.send('AppleTV_in\n')
-            subprocess.call(". ./AppleTV_in.sh", shell=True)
-            bus.write_byte_data(0x70, 0x40, 0x06)
-            bus.write_byte_data(0x48, 0x17, 10)
-            bus.write_byte_data(0x70, 0x40, 0x05)
-            bus.write_byte_data(0x48, 0x17, 10)
-            bus.write_byte_data(0x70, 0x40, 0x04)
-            bus.write_byte_data(0x48, 0x17, 10)
+            GPIO.output("P8_15", GPIO.LOW)  # SonyTV
+            GPIO.output("P8_17", GPIO.HIGH)  # AppleTV
+            GPIO.output("P8_19", GPIO.LOW)  # BBB
+            mute()
+            time.sleep(.5)
+            os.system("pkill -f squeezelite")
+            os.system("pkill -f sox")
+            GPIO.setup("P8_7", GPIO.OUT) 
+            GPIO.output("P8_9", GPIO.LOW)  # turn on SPDIF switch
+            GPIO.output("P8_7", GPIO.LOW)  # select optical input
+            with open('/sys/class/gpio/gpio23/value') as f:
+                 lines = f.readlines()
+            try:
+                 PIN13 = int(lines[0])
+            except IndexError:
+                 PIN13 = 0
+            print(PIN13)
+            if PIN13 == 1:
+               os.system("chrt -f 45 sox --buffer 512  -c 2 -t alsa hw:1,0 -t alsa plug:TV-inhw &")
+            else:
+               os.system("chrt -f 45 sox --buffer 512  -c 2 -t alsa hw:1,0 -t alsa plug:TV-in &")
+            set6 = volume + int(midrange * volume / 100)
+            set5 = volume + int(woofer * volume / 100)
+            set4 = volume + int(tweeter * volume / 100)
+            unmute()
+        elif line == 'SonyTV_in':
+            self.send('SonyTV_in\n')
+            GPIO.output("P8_15", GPIO.HIGH)  # SonyTV
+            GPIO.output("P8_17", GPIO.LOW)  # AppleTV
+            GPIO.output("P8_19", GPIO.LOW)  # BBB
+            mute()
+            time.sleep(.5)
+            os.system("pkill -f squeezelite")
+            os.system("pkill -f sox")
+            GPIO.output("P8_9", GPIO.LOW)  # turn on SPDIF switch
+            GPIO.output("P8_7", GPIO.HIGH)  # select optical input
+            with open('/sys/class/gpio/gpio23/value') as f:
+                 lines = f.readlines()
+            try:
+                 PIN13 = int(lines[0])
+            except IndexError:
+                 PIN13 = 0
+            print(PIN13)
+            if PIN13 == 1:
+               os.system("chrt -f 45 sox --buffer 512  -c 2 -t alsa hw:1,0 -t alsa plug:TV-inhw &")
+            else:
+               os.system("chrt -f 45 sox --buffer 512  -c 2 -t alsa hw:1,0 -t alsa plug:TV-in &")
+            set6 = volume + int(midrange * volume / 100)
+            set5 = volume + int(woofer * volume / 100)
+            set4 = volume + int(tweeter * volume / 100)
+            unmute()
         elif line.startswith("set it to"):
 	    value = int(line[10:13])
-        # print(value)
 	    volume = value
             set6 = volume + int(midrange * volume / 100)
             set5 = volume + int(woofer * volume / 100)
@@ -145,13 +269,6 @@ class Client(asyncore.dispatcher_with_send):
             set6 = volume + int(midrange * volume / 100)
             bus.write_byte_data(0x70, 0x40, 0x06)
             bus.write_byte_data(0x48, 0x17, set6)
-            self.send("ok\n")
-        elif line.startswith("woofer"):
-            woofer = int(line[7:10])
-            # print(woofer)
-            set5 = volume + int(woofer * volume / 100)
-            bus.write_byte_data(0x70, 0x40, 0x05)
-            bus.write_byte_data(0x48, 0x17, set5)
             self.send("ok\n")
         elif line.startswith("balance"):
             balance = int(line[8:11])
@@ -297,6 +414,7 @@ if __name__ == "__main__":
     pollster = EPoll()
     pollster.register(Server(("",8192),pollster), select.EPOLLIN)
     pollster.register(Server(("",8193),pollster), select.EPOLLIN)
+    pollster.register(Server(("",8194),pollster), select.EPOLLIN)
     while True:
         #import ipdb; ipdb.set_trace()
         evt = pollster.poll()

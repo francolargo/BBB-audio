@@ -35,15 +35,16 @@ GPIO.setup("P8_19", GPIO.OUT)
 GPIO.output("P8_19", GPIO.HIGH)
 # initialize for BBB -> speakers
 os.chdir("/usr/script")
+os.system("amixer -c miniStreamer cset numid=8 1") # set up miniStreamer for SPDIF input
 os.system("pkill -f squeezelite")
 os.system("pkill -f sox")
-os.system("squeezelite -z -C 1 -o default -a 8192:2048::0")
+os.system("squeezelite -z -C 1 -o default -a 8192:2048::0") # start squeezelite as default
 time.sleep(1)
-# volume & setup
-LIGHT = 0
-volume = 10
-tweeter = 30
-midrange = 40
+# presets for gentle startup
+balance = 20
+volume = 5
+tweeter = 40
+midrange = 30
 woofer = 0
 rate = 0
 rawrate = 0
@@ -64,7 +65,6 @@ except IOError as err:
    print "DAC turned on?"
 else:
    print "DAC ready"
-#os.spawnl(os.P_DETACH, "./buttons.py")
 class Client(asyncore.dispatcher_with_send):
     def __init__(self, socket=None, pollster=None):
         asyncore.dispatcher_with_send.__init__(self, socket)
@@ -91,20 +91,26 @@ class Client(asyncore.dispatcher_with_send):
     def handle_command(self, line):
         global tweeter
         global midrange
-        global woofer
+        global woofer  # woofer controls not used - set at full volume
         global volume
+        global balance
+        global set4
+        global set5
+        global set6
         global rate
         global mutebus
         global PIN13
         global PIN19
         def mute():
             bus.write_byte_data(0x70, 0x40, 0x06)
+            bus.write_byte_data(0x48, 0x17, 0x00)
             bus.write_byte_data(0x48, 0x17, 0xcf)
             bus.write_byte_data(0x70, 0x40, 0x05)
+            bus.write_byte_data(0x48, 0x17, 0x00)
             bus.write_byte_data(0x48, 0x17, 0xcf)
             bus.write_byte_data(0x70, 0x40, 0x04)
+            bus.write_byte_data(0x48, 0x17, 0x00)
             bus.write_byte_data(0x48, 0x17, 0xcf)
-
         def unmute():
             bus.write_byte_data(0x70, 0x40, 0x06)
             bus.write_byte_data(0x48, 0x17, 0xce)
@@ -115,15 +121,16 @@ class Client(asyncore.dispatcher_with_send):
             bus.write_byte_data(0x70, 0x40, 0x04)
             bus.write_byte_data(0x48, 0x17, 0xce)
             bus.write_byte_data(0x48, 0x17, set4)
-
+    
         if line == 'BBB_in':
             self.send('BBB_in\n')
+            mute()
             GPIO.output("P8_15", GPIO.LOW)  # SonyTV
             GPIO.output("P8_17", GPIO.LOW)  # AppleTV
             GPIO.output("P8_19", GPIO.HIGH)  # BBB
-            mute()
-            time.sleep(.5)
+            time.sleep(1)
             os.system("pkill -f squeezelite")
+            #time.sleep(.1)
             os.system("pkill -f sox")
             GPIO.output("P8_9", GPIO.HIGH)  # Otto off
             with open('/sys/class/gpio/gpio23/value') as f:
@@ -134,20 +141,21 @@ class Client(asyncore.dispatcher_with_send):
                  PIN13 = 0
             print(PIN13)
             if PIN13 == 1:
-               os.system("squeezelite -z -C 1 -o hw:0,0 -a 8192:2048::0")
+               os.system("squeezelite -z -C 1 -o hw:0,0 -a 8192:2048::0")  # no crossover
             else:
-               os.system("squeezelite -z -C 1 -o default -a 8192:2048::0")
+               os.system("squeezelite -z -C 1 -o default -a 8192:2048::0")  # with crossover
             time.sleep(1)
-            set6 = volume + int(midrange * volume / 100)
-            set5 = volume + int(woofer * volume / 100)
-            set4 = volume + int(tweeter * volume / 100)
+            volume = 5
+            set6 = volume - int(midrange * 0.01 * volume)
+            set5 = volume - int(woofer * 0.01 * volume)
+            set4 = volume - int(tweeter * 0.01 * volume)
             unmute()
         elif line == 'speakers':
             self.send('speakers_out\n')
             GPIO.output("P8_10", GPIO.HIGH)  # Speaker LED
             GPIO.output("P8_13", GPIO.LOW)  # Headphone LED
             mute()
-            time.sleep(.5)
+            time.sleep(1)
             os.system("pkill -f squeezelite")
             os.system("pkill -f sox")
             with open('/sys/class/gpio/gpio22/value') as f:
@@ -162,16 +170,17 @@ class Client(asyncore.dispatcher_with_send):
                time.sleep(1)
             else:
                os.system("chrt -f 45 sox --buffer 512  -c 2 -t alsa hw:1,0 -t alsa plug:TV-in &")
-            set6 = volume + int(midrange * volume / 100)
-            set5 = volume + int(woofer * volume / 100)
-            set4 = volume + int(tweeter * volume / 100)
+            volume = 5
+            set6 = volume - int(midrange * 0.01 * volume)
+            set5 = volume - int(woofer * 0.01 * volume)
+            set4 = volume - int(tweeter * 0.01 * volume)
             unmute()
         elif line == 'phones':
             self.send('phones_out\n')
             GPIO.output("P8_10", GPIO.LOW)  # Speaker LED
             GPIO.output("P8_13", GPIO.HIGH)  # Headphone LED
             mute()
-            time.sleep(.5)
+            time.sleep(1)
             os.system("pkill -f squeezelite")
             os.system("pkill -f sox")
             with open('/sys/class/gpio/gpio22/value') as f:
@@ -186,17 +195,18 @@ class Client(asyncore.dispatcher_with_send):
                time.sleep(1)
             else:
                os.system("chrt -f 45 sox --buffer 512  -c 2 -t alsa hw:1,0 -t alsa plug:TV-inhw &")
-            set6 = volume + int(midrange * volume / 100)
-            set5 = volume + int(woofer * volume / 100)
-            set4 = volume + int(tweeter * volume / 100)
+            volume = 5
+            set6 = volume - int(midrange * 0.01 * volume)
+            set5 = volume - int(woofer * 0.01 * volume)
+            set4 = volume - int(tweeter * 0.01 * volume)
             unmute()
         elif line == 'AppleTV_in':
             self.send('AppleTV_in\n')
+            mute()
             GPIO.output("P8_15", GPIO.LOW)  # SonyTV
             GPIO.output("P8_17", GPIO.HIGH)  # AppleTV
             GPIO.output("P8_19", GPIO.LOW)  # BBB
-            mute()
-            time.sleep(.5)
+            time.sleep(1)
             os.system("pkill -f squeezelite")
             os.system("pkill -f sox")
             GPIO.setup("P8_7", GPIO.OUT) 
@@ -213,17 +223,18 @@ class Client(asyncore.dispatcher_with_send):
                os.system("chrt -f 45 sox --buffer 512  -c 2 -t alsa hw:1,0 -t alsa plug:TV-inhw &")
             else:
                os.system("chrt -f 45 sox --buffer 512  -c 2 -t alsa hw:1,0 -t alsa plug:TV-in &")
-            set6 = volume + int(midrange * volume / 100)
-            set5 = volume + int(woofer * volume / 100)
-            set4 = volume + int(tweeter * volume / 100)
+            volume = 5
+            set6 = volume - int(midrange * 0.01 * volume)
+            set5 = volume - int(woofer * 0.01 * volume)
+            set4 = volume - int(tweeter * 0.01 * volume)
             unmute()
         elif line == 'SonyTV_in':
             self.send('SonyTV_in\n')
+            mute()
             GPIO.output("P8_15", GPIO.HIGH)  # SonyTV
             GPIO.output("P8_17", GPIO.LOW)  # AppleTV
             GPIO.output("P8_19", GPIO.LOW)  # BBB
-            mute()
-            time.sleep(.5)
+            time.sleep(1)
             os.system("pkill -f squeezelite")
             os.system("pkill -f sox")
             GPIO.output("P8_9", GPIO.LOW)  # turn on SPDIF switch
@@ -239,16 +250,17 @@ class Client(asyncore.dispatcher_with_send):
                os.system("chrt -f 45 sox --buffer 512  -c 2 -t alsa hw:1,0 -t alsa plug:TV-inhw &")
             else:
                os.system("chrt -f 45 sox --buffer 512  -c 2 -t alsa hw:1,0 -t alsa plug:TV-in &")
-            set6 = volume + int(midrange * volume / 100)
-            set5 = volume + int(woofer * volume / 100)
-            set4 = volume + int(tweeter * volume / 100)
+            volume = 5
+            set6 = volume - int(midrange * 0.01 * volume)
+            set5 = volume - int(woofer * 0.01 * volume)
+            set4 = volume - int(tweeter * 0.01 * volume)
             unmute()
         elif line.startswith("set it to"):
-	    value = int(line[10:13])
-	    volume = value
-            set6 = volume + int(midrange * volume / 100)
-            set5 = volume + int(woofer * volume / 100)
-            set4 = volume + int(tweeter * volume / 100)
+	    volume = int(line[10:13])
+            #print (line)
+            set6 = volume - int(midrange * 0.01 * volume)
+            set5 = volume - int(woofer * 0.01 * volume)
+            set4 = volume - int(tweeter * 0.01 * volume)
             bus.write_byte_data(0x70, 0x40, 0x06)
             bus.write_byte_data(0x48, 0x17, set6)
             bus.write_byte_data(0x70, 0x40, 0x05)
@@ -256,55 +268,55 @@ class Client(asyncore.dispatcher_with_send):
             bus.write_byte_data(0x70, 0x40, 0x04)
             bus.write_byte_data(0x48, 0x17, set4)
             self.send("ok\n")
-        elif line.startswith("tweeter"):
-            tweeter = int(line[8:11])
-            # print(tweeter)
-            set4 = volume + int(tweeter * volume / 100)
+        elif line.startswith("tweeterset"):
+            tweeter = int(line[11:14])
+            #print (line)
+            set4 = volume - int(tweeter * 0.01 * volume)
             bus.write_byte_data(0x70, 0x40, 0x04)
             bus.write_byte_data(0x48, 0x17, set4)
             self.send("ok\n")
-        elif line.startswith("midrange"):
-            midrange = int(line[9:12])
-            # print(midrange)
-            set6 = volume + int(midrange * volume / 100)
+        elif line.startswith("midrangeset"):
+            midrange = int(line[12:15])
+            #print (line)
+            set6 = volume - int(midrange * 0.01 * volume)
             bus.write_byte_data(0x70, 0x40, 0x06)
             bus.write_byte_data(0x48, 0x17, set6)
             self.send("ok\n")
-        elif line.startswith("balance"):
-            balance = int(line[8:11])
-            # print(balance)
-            if balance >= 0:
-                 bus.write_byte_data(0x70, 0x40, 0x06)
-                 bus.write_byte_data(0x48, 0x00, balance)
-                 bus.write_byte_data(0x48, 0x04, balance)
-                 bus.write_byte_data(0x48, 0x01, 0)
-                 bus.write_byte_data(0x48, 0x05, 0)
-                 bus.write_byte_data(0x70, 0x40, 0x05)
-                 bus.write_byte_data(0x48, 0x00, balance)
-                 bus.write_byte_data(0x48, 0x04, balance)
-                 bus.write_byte_data(0x48, 0x01, 0)
-                 bus.write_byte_data(0x48, 0x05, 0)
-                 bus.write_byte_data(0x70, 0x40, 0x04)
-                 bus.write_byte_data(0x48, 0x00, balance)
-                 bus.write_byte_data(0x48, 0x04, balance)
-                 bus.write_byte_data(0x48, 0x01, 0)
-                 bus.write_byte_data(0x48, 0x05, 0)
+        elif line.startswith("balanceset"):
+            balance = int(line[11:14]) # for balance range 0-40, 20 = centered
+            #print (balance)
+            if balance >= 20:
+                bus.write_byte_data(0x70, 0x40, 0x06)
+                bus.write_byte_data(0x48, 0x00, balance - 20)
+                bus.write_byte_data(0x48, 0x04, balance - 20)
+                bus.write_byte_data(0x48, 0x01, 0)
+                bus.write_byte_data(0x48, 0x05, 0)
+                bus.write_byte_data(0x70, 0x40, 0x05)
+                bus.write_byte_data(0x48, 0x00, balance - 20)
+                bus.write_byte_data(0x48, 0x04, balance - 20)
+                bus.write_byte_data(0x48, 0x01, 0)
+                bus.write_byte_data(0x48, 0x05, 0)
+                bus.write_byte_data(0x70, 0x40, 0x04)
+                bus.write_byte_data(0x48, 0x00, balance - 20)
+                bus.write_byte_data(0x48, 0x04, balance - 20)
+                bus.write_byte_data(0x48, 0x01, 0)
+                bus.write_byte_data(0x48, 0x05, 0)
             else:
-                 bus.write_byte_data(0x70, 0x40, 0x06)
-                 bus.write_byte_data(0x48, 0x01, -1*balance)
-                 bus.write_byte_data(0x48, 0x05, -1*balance)
-                 bus.write_byte_data(0x48, 0x00, 0)
-                 bus.write_byte_data(0x48, 0x04, 0)
-                 bus.write_byte_data(0x70, 0x40, 0x05)
-                 bus.write_byte_data(0x48, 0x01, -1*balance)
-                 bus.write_byte_data(0x48, 0x05, -1*balance)
-                 bus.write_byte_data(0x48, 0x00, 0)
-                 bus.write_byte_data(0x48, 0x04, 0) 
-                 bus.write_byte_data(0x70, 0x40, 0x04)
-                 bus.write_byte_data(0x48, 0x01, balance)
-                 bus.write_byte_data(0x48, 0x05, balance)
-                 bus.write_byte_data(0x48, 0x00, 0)
-                 bus.write_byte_data(0x48, 0x04, 0) 
+                bus.write_byte_data(0x70, 0x40, 0x06)
+                bus.write_byte_data(0x48, 0x01, 20 - balance)
+                bus.write_byte_data(0x48, 0x05, 20 - balance)
+                bus.write_byte_data(0x48, 0x00, 0)
+                bus.write_byte_data(0x48, 0x04, 0)
+                bus.write_byte_data(0x70, 0x40, 0x05)
+                bus.write_byte_data(0x48, 0x01, 20 - balance)
+                bus.write_byte_data(0x48, 0x05, 20 - balance)
+                bus.write_byte_data(0x48, 0x00, 0)
+                bus.write_byte_data(0x48, 0x04, 0) 
+                bus.write_byte_data(0x70, 0x40, 0x04)
+                bus.write_byte_data(0x48, 0x01, 20 - balance)
+                bus.write_byte_data(0x48, 0x05, 20 - balance)
+                bus.write_byte_data(0x48, 0x00, 0)
+                bus.write_byte_data(0x48, 0x04, 0) 
             self.send("ok\n") 
         elif line == 'toggle mute':
             bus.write_byte_data(0x70, 0x40, 0x06)   
@@ -331,6 +343,7 @@ class Client(asyncore.dispatcher_with_send):
             elif mutebus == 206:
                  self.send("UNMUTE\n")
                  print("muted")
+            #self.send("ok\n")
         elif line == 'get freq':
             with open('/proc/asound/Botic/pcm0p/sub0/hw_params') as f:
                  lines = f.readlines()
@@ -354,6 +367,22 @@ class Client(asyncore.dispatcher_with_send):
                self.send('176 kHz\n')
             elif rate == 192:
                self.send('192 kHz\n')
+        elif line == 'volume':
+               volstring = str(volume)
+               self.send(volstring + '\n')
+        elif line == 'tweeter':
+               twstring = str(tweeter)
+               print (twstring)
+               self.send(twstring + '\n')
+        elif line == 'midrange':
+               print (midrange)
+               midstring = str(midrange)       
+               print (midstring)
+               self.send(midstring + '\n') 
+        elif line == 'balance':
+               balstring = str(balance)        
+               print (balstring)
+               self.send(balstring + '\n') 
         else:
             self.send('unknown command\n')
             print 'Unknown command:', line
@@ -412,11 +441,11 @@ class EPoll(object):
 
 if __name__ == "__main__":
     pollster = EPoll()
-    pollster.register(Server(("",8192),pollster), select.EPOLLIN)
-    pollster.register(Server(("",8193),pollster), select.EPOLLIN)
-    pollster.register(Server(("",8194),pollster), select.EPOLLIN)
+    pollster.register(Server(("",8192),pollster), select.EPOLLIN) #iPad
+    pollster.register(Server(("",8193),pollster), select.EPOLLIN) #F iPhone6
+    pollster.register(Server(("",8194),pollster), select.EPOLLIN) #front panel
+    pollster.register(Server(("",8195),pollster), select.EPOLLIN) #LR iPhone5
     while True:
-        #import ipdb; ipdb.set_trace()
         evt = pollster.poll()
         for obj, flags in evt:
             readwrite(obj, flags)

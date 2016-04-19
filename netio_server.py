@@ -50,17 +50,21 @@ rate = 0
 rawrate = 0
 bus = smbus.SMBus(1)
 mutebus = 207
-# setup I2C volume control
+# setup DACs via I2C - volume, DPLL bandwidth
 try:
    bus.write_byte_data(0x70, 0x40, 0x06)
    bus.write_byte_data(0x48, 0x17, volume)
    bus.write_byte_data(0x48, 0x0a, 206)
+   bus.write_byte_data(0x48, 0x0b, 0x81)  # DPLL = "no bandwidth"
    bus.write_byte_data(0x70, 0x40, 0x05)
    bus.write_byte_data(0x48, 0x17, volume)
    bus.write_byte_data(0x48, 0x0a, 206)
+   bus.write_byte_data(0x48, 0x0b, 0x81)
    bus.write_byte_data(0x70, 0x40, 0x04)
    bus.write_byte_data(0x48, 0x17, volume)
    bus.write_byte_data(0x48, 0x0a, 206)
+   bus.write_byte_data(0x48, 0x0b, 0x81)
+
 except IOError as err:
    print "DAC turned on?"
 else:

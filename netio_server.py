@@ -38,8 +38,10 @@ os.chdir("/usr/script")
 os.system("amixer -c miniStreamer cset numid=8 1") # set up miniStreamer for SPDIF input
 os.system("pkill -f squeezelite")
 os.system("pkill -f sox")
+time.sleep(.2)
 os.system("squeezelite -z -C 1 -o default -a 8192:2048::0") # start squeezelite as default
-time.sleep(1)
+time.sleep(1.2)
+print "opening squeezelite"
 # presets for gentle startup
 balance = 20
 volume = 5
@@ -50,7 +52,7 @@ rate = 0
 rawrate = 0
 bus = smbus.SMBus(1)
 mutebus = 207
-# setup DACs via I2C - volume, DPLL bandwidth
+# setup I2C volume, DPLL bandwidth 
 try:
    bus.write_byte_data(0x70, 0x40, 0x06)
    bus.write_byte_data(0x48, 0x17, volume)
@@ -64,7 +66,6 @@ try:
    bus.write_byte_data(0x48, 0x17, volume)
    bus.write_byte_data(0x48, 0x0a, 206)
    bus.write_byte_data(0x48, 0x0b, 0x81)
-
 except IOError as err:
    print "DAC turned on?"
 else:
@@ -115,7 +116,7 @@ class Client(asyncore.dispatcher_with_send):
             bus.write_byte_data(0x70, 0x40, 0x04)
             bus.write_byte_data(0x48, 0x17, 0x00)
             bus.write_byte_data(0x48, 0x0a, 0xcf)
-            print ("mute ran")
+            print "mute ran"
         def unmute():
             bus.write_byte_data(0x70, 0x40, 0x06)
             bus.write_byte_data(0x48, 0x0a, 0xce)
@@ -133,10 +134,9 @@ class Client(asyncore.dispatcher_with_send):
             GPIO.output("P8_15", GPIO.LOW)  # SonyTV
             GPIO.output("P8_17", GPIO.LOW)  # AppleTV
             GPIO.output("P8_19", GPIO.HIGH)  # BBB
-            time.sleep(.5)
             os.system("pkill -f squeezelite")
-            #time.sleep(.1)
             os.system("pkill -f sox")
+            time.sleep(.5) # sox needs a pause to finish the kill
             GPIO.output("P8_9", GPIO.HIGH)  # Otto off
             with open('/sys/class/gpio/gpio23/value') as f:
                  lines = f.readlines()
@@ -144,12 +144,13 @@ class Client(asyncore.dispatcher_with_send):
                  PIN13 = int(lines[0])
             except IndexError:
                  PIN13 = 0
-            print(PIN13)
+            print (PIN13)
             if PIN13 == 1:
                os.system("squeezelite -z -C 1 -o hw:0,0 -a 8192:2048::0")  # no crossover
             else:
                os.system("squeezelite -z -C 1 -o default -a 8192:2048::0")  # with crossover
-            time.sleep(1)
+            time.sleep(1.2)
+            print "squeezelite started?"
             volume = 5
             set6 = volume - int(midrange * 0.01 * volume)
             set5 = volume - int(woofer * 0.01 * volume)
@@ -160,9 +161,9 @@ class Client(asyncore.dispatcher_with_send):
             GPIO.output("P8_10", GPIO.HIGH)  # Speaker LED
             GPIO.output("P8_13", GPIO.LOW)  # Headphone LED
             mute()
-            time.sleep(.5)
             os.system("pkill -f squeezelite")
             os.system("pkill -f sox")
+            time.sleep(.5)
             with open('/sys/class/gpio/gpio22/value') as f:
                  lines = f.readlines()
             try:
@@ -172,7 +173,7 @@ class Client(asyncore.dispatcher_with_send):
             print(PIN19)
             if PIN19 == 1:
                os.system("squeezelite -z -C 1 -o default -a 8192:2048::0")
-               time.sleep(1)
+               time.sleep(1.2)
             else:
                os.system("chrt -f 45 sox --buffer 512  -c 2 -t alsa hw:1,0 -t alsa plug:TV-in &")
             volume = 5
@@ -185,9 +186,9 @@ class Client(asyncore.dispatcher_with_send):
             GPIO.output("P8_10", GPIO.LOW)  # Speaker LED
             GPIO.output("P8_13", GPIO.HIGH)  # Headphone LED
             mute()
-            time.sleep(.5)
             os.system("pkill -f squeezelite")
             os.system("pkill -f sox")
+            time.sleep(.3)
             with open('/sys/class/gpio/gpio22/value') as f:
                  lines = f.readlines()
             try:
@@ -197,7 +198,7 @@ class Client(asyncore.dispatcher_with_send):
             print(PIN19)
             if PIN19 == 1:
                os.system("squeezelite -z -C 1 -o hw:0,0 -a 8192:2048::0")
-               time.sleep(1)
+               time.sleep(1.2)
             else:
                os.system("chrt -f 45 sox --buffer 512  -c 2 -t alsa hw:1,0 -t alsa plug:TV-inhw &")
             volume = 5
@@ -211,9 +212,9 @@ class Client(asyncore.dispatcher_with_send):
             GPIO.output("P8_15", GPIO.LOW)  # SonyTV
             GPIO.output("P8_17", GPIO.HIGH)  # AppleTV
             GPIO.output("P8_19", GPIO.LOW)  # BBB
-            time.sleep(.5)
             os.system("pkill -f squeezelite")
             os.system("pkill -f sox")
+            time.sleep(.5)
             GPIO.setup("P8_7", GPIO.OUT) 
             GPIO.output("P8_9", GPIO.LOW)  # turn on SPDIF switch
             GPIO.output("P8_7", GPIO.LOW)  # select optical input
@@ -239,9 +240,9 @@ class Client(asyncore.dispatcher_with_send):
             GPIO.output("P8_15", GPIO.HIGH)  # SonyTV
             GPIO.output("P8_17", GPIO.LOW)  # AppleTV
             GPIO.output("P8_19", GPIO.LOW)  # BBB
-            time.sleep(.5)
             os.system("pkill -f squeezelite")
             os.system("pkill -f sox")
+            time.sleep(.5)
             GPIO.output("P8_9", GPIO.LOW)  # turn on SPDIF switch
             GPIO.output("P8_7", GPIO.HIGH)  # select optical input
             with open('/sys/class/gpio/gpio23/value') as f:

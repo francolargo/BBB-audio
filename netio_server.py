@@ -136,7 +136,7 @@ class Client(asyncore.dispatcher_with_send):
             GPIO.output("P8_19", GPIO.HIGH)  # BBB
             os.system("pkill -f squeezelite")
             os.system("pkill -f sox")
-            time.sleep(.5) # sox needs a pause to finish the kill
+            time.sleep(.5) # kill needs a pause to shut-down SoX
             GPIO.output("P8_9", GPIO.HIGH)  # Otto off
             with open('/sys/class/gpio/gpio23/value') as f:
                  lines = f.readlines()

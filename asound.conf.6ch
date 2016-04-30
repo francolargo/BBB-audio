@@ -45,27 +45,27 @@ pcm.filter1 {
                label RTlr4hipass
                policy none
                input.bindings.0 "Input"
-               output.bindings.6 "Output"
+               output.bindings.0 "Output"
                input { controls [ 220 ] }
           }
         5 {
                label RTlr4hipass
                policy none
                input.bindings.1 "Input"
-               output.bindings.7 "Output"
+               output.bindings.1 "Output"
                input { controls [ 220 ] }
           }
         6 {
                label RTlr4lowpass
                policy none
-               input.bindings.6 "Input"
+               input.bindings.0 "Input"
                output.bindings.6 "Output"
                input { controls [ 4000 ] }
           }
         7 {
                label RTlr4lowpass
                policy none
-               input.bindings.7 "Input"
+               input.bindings.1 "Input"
                output.bindings.7 "Output"
                input { controls [ 4000 ] }
           }

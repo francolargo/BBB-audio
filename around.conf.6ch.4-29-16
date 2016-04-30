@@ -1,0 +1,167 @@
+pcm.!default {
+     type plug
+     slave.pcm filter1
+}
+pcm.TV-in {
+     type plug
+     slave {
+         pcm filter1
+         rate  96000
+     }
+}
+pcm.TV-inhw {
+     type plug
+     slave {
+         pcm "hw:0,0"
+         rate  96000
+     }
+}
+
+ctl.!default {
+     type hw
+     card 0
+}
+pcm.filter1 {
+     type ladspa
+     slave.pcm equil
+     path "/usr/lib/ladspa"    
+     channels 8
+     plugins
+     {
+        0 {
+               id 9006  # label RTlr4lowpass
+               policy none
+               input.bindings.0 "Input"
+               output.bindings.2 "Output"
+               input { controls [ 180 ] } 
+          }
+        1 {
+               id 9007  # label RThighpass
+               policy none
+               input.bindings.0 "Input"
+               output.bindings.4 "Output"
+               input { controls [ 3200 ] }
+          }
+        2 {
+               id 9006  # label RTlr4lowpass
+               policy none
+               input.bindings.1 "Input"
+               output.bindings.3 "Output"
+               input { controls [ 180 ] }
+          }
+        3 {
+               id 9007  # label RThighpass
+               policy none
+               input.bindings.1 "Input"
+               output.bindings.5 "Output"
+               input { controls [ 3200 ] }
+          }
+        4 {
+               id 9006  # label RTlowpass
+               policy none
+               input.bindings.0 "Input"
+               output.bindings.0 "Output"
+               input { controls [ 3200 ] }
+          }
+        5 {
+               id 9006  # label RTlowpass
+               policy none
+               input.bindings.1 "Input"
+               output.bindings.1 "Output"
+               input { controls [ 3200 ] }
+          }
+        6 {
+               id 9007  # label RTlr4lhipass
+               policy none
+               input.bindings.0 "Input"
+               output.bindings.6 "Output"
+               input { controls [ 180 ] }
+          }
+        7 {
+               id 9007  # label RTlr4hipass
+               policy none
+               input.bindings.1 "Input"
+               output.bindings.7 "Output"
+               input { controls [ 180 ] }
+          }
+
+     }
+}
+pcm.equil {
+     type ladspa
+     slave.pcm  speaker
+     path "/usr/lib/ladspa" 
+     channels 8
+     plugins
+     {
+        0 {
+               id 9001
+               policy none
+               input.bindings.2 "Input"
+               output.bindings.2 "Output"
+               input { controls [ 4 25 1 ] }    # right woofer eq
+          }
+        1 {
+               id 9001
+               policy none
+               input.bindings.3 "Input"
+               output.bindings.3 "Output"
+               input { controls [ 4 25 1 ] }    # left woofer eq
+          }
+        2 {
+               id 9003
+               policy none
+               input.bindings.6 "Input"
+               output.bindings.6 "Output"
+               input { controls [ -4 1000 0.71 ] }    # right mid shelf
+          }
+        3 {
+               id 9003
+               policy none
+               input.bindings.7 "Input"
+               output.bindings.7 "Output"
+               input { controls [ -4 1000 0.71 ] }    # left mid shelf
+          }
+        4 {
+               id 9010
+               policy none
+               input.bindings.4 "Input"
+               output.bindings.4 "Output"
+               input { controls [ 12000 ] }    # right high allpass
+          }
+        5 {
+               id 9010
+               policy none
+               input.bindings.5 "Input"
+               output.bindings.5 "Output"
+               input { controls [ 12000 ] }    # left high allpass
+          }
+     }
+}
+pcm.speaker {
+    type plug
+    slave {
+     pcm "t-table"  
+     channels 8
+     rate "unchanged"
+    }
+}
+pcm.t-table  {
+    type route
+    slave {
+     pcm "hw:0,0"
+     channels 8
+    }
+    ttable {
+      0.7   0
+      1.3   0   
+      2.1   1  #left bass
+      3.5   1  #right bass
+      4.2   1  #left tweeter
+      5.6   1  #right tweeter
+      6.0   1  #left mid
+      7.4   1  #right mid
+    }
+}
+
+#pcm.plughw.slave.rate = "unchanged";

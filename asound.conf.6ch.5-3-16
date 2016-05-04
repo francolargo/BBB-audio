@@ -1,0 +1,293 @@
+pcm.!default {
+     type plug
+     slave.pcm filter1
+}
+pcm.TV-in {
+     type plug
+     slave {
+         pcm filter1
+     }
+}
+pcm.TV-inhw {
+     type plug
+     slave {
+         pcm "hw:0,0"
+         rate  96000
+     }
+}
+ctl.!default {
+     type hw
+     card 0
+}
+pcm.filter1 {
+     type ladspa
+     slave.pcm filter2
+     path "/usr/lib/ladspa"    
+     channels 8
+     plugins
+     {
+        0 {
+               id 9006  # label RTlowpass
+               policy none
+               input.bindings.0 "Input"
+               output.bindings.2 "Output"
+               input { controls [ 160 ] } 
+          }
+        1 {
+               id 9021  # label RThighpass
+               policy none
+               input.bindings.0 "Input"
+               output.bindings.4 "Output"
+               input { controls [ 5000 ] }
+          }
+        2 {
+               id 9006  # label RTlowpass
+               policy none
+               input.bindings.1 "Input"
+               output.bindings.3 "Output"
+               input { controls [ 160 ] }
+          }
+        3 {
+               id 9021  # label RTlr4hipass
+               policy none
+               input.bindings.1 "Input"
+               output.bindings.5 "Output"
+               input { controls [ 5000 ] }
+          }
+        4 {
+               id 9020  # label RTlr4lowpass
+               policy none
+               input.bindings.0 "Input"
+               output.bindings.6 "Output"
+               input { controls [ 5000 ] }
+          }
+        5 {
+               id 9020  # label RTlr4lowpass
+               policy none
+               input.bindings.1 "Input"
+               output.bindings.7 "Output"
+               input { controls [ 5000 ] }
+          }
+     }
+}
+pcm.filter2 {
+     type ladspa
+     slave.pcm equil1
+     path "/usr/lib/ladspa"
+     channels 8
+     plugins
+     {
+        0 {
+               id 1098
+               policy none
+               input.bindings.2 "Input"
+               output.bindings.2 "Output"
+          }
+        1 {
+               id 1098
+               policy none
+               input.bindings.3 "Input"
+               output.bindings.3 "Output"
+          }
+        2 {
+               id 9007
+               policy none
+               input.bindings.6 "Input"
+               output.bindings.6 "Output"
+               input { controls [ 160 ] }    # mid high pass
+          }
+        3 {
+               id 9007
+               policy none
+               input.bindings.7 "Input"
+               output.bindings.7 "Output"
+               input { controls [ 160 ] }    # mid high pass
+          }
+        4 {
+               id 1098
+               policy none
+               input.bindings.4 "Input"
+               output.bindings.4 "Output"
+          }
+        5 {
+               id 1098
+               policy none
+               input.bindings.5 "Input"
+               output.bindings.5 "Output"
+          }
+     }
+}
+pcm.equil1 {
+     type ladspa
+     slave.pcm equil2
+     path "/usr/lib/ladspa" 
+     channels 8
+     plugins
+     {
+        0 {
+               id 9001
+               policy none
+               input.bindings.2 "Input"
+               output.bindings.2 "Output"
+               input { controls [ -2 45 2.5 ] }    #  woofer 45 Hz bump
+          }
+        1 {
+               id 9001
+               policy none
+               input.bindings.3 "Input"
+               output.bindings.3 "Output"
+               input { controls [ -2 45 2.5 ] }    #  woofer 45 Hz bump
+          }
+        2 {
+               id 9001
+               policy none
+               input.bindings.6 "Input"
+               output.bindings.6 "Output"
+               input { controls [ -5 1330 2.5 ] }    #  mid room mode
+          }
+        3 {
+               id 9001
+               policy none
+               input.bindings.7 "Input"
+               output.bindings.7 "Output"
+               input { controls [ -5 1330 2.5 ] }    #  mid room mode
+          }
+        4 {
+               id 9001
+               policy none
+               input.bindings.4 "Input"
+               output.bindings.4 "Output"
+               # input { controls [ -9 4050 3 ] }    #  high room mode
+          }
+        5 {
+               id 9001
+               policy none
+               input.bindings.5 "Input"
+               output.bindings.5 "Output"
+               # input { controls [ -9 4050 3 ] }    #  high room mode
+          }
+     }
+}
+pcm.equil2 {
+     type ladspa
+     slave.pcm equil3
+     path "/usr/lib/ladspa"
+     channels 8
+     plugins
+     {
+        0 {
+               id 9001
+               policy none
+               input.bindings.2 "Input"
+               output.bindings.2 "Output"
+               input { controls [ 3 25 2 ] } # woofer low end
+          }
+        1 {
+               id 9001
+               policy none
+               input.bindings.3 "Input"
+               output.bindings.3 "Output"
+               input { controls [ 3 25 2 ] } # woofer low end
+          }
+        2 {
+               id 9001
+               policy none
+               input.bindings.6 "Input"
+               output.bindings.6 "Output"
+               input { controls [ -4 2636 3 ] }    # mid room mode
+          }
+        3 {
+               id 9001
+               policy none
+               input.bindings.7 "Input"
+               output.bindings.7 "Output"
+               input { controls [ -4 2636 3 ] }    # mid room mode
+          }
+        4 {
+               id 1098
+               policy none
+               input.bindings.4 "Input"
+               output.bindings.4 "Output"
+          }
+        5 {
+               id 1098
+               policy none
+               input.bindings.5 "Input"
+               output.bindings.5 "Output"
+          }
+     }
+}
+pcm.equil3 {
+     type ladspa
+     slave.pcm speaker
+     path "/usr/lib/ladspa"
+     channels 8
+     plugins
+     {
+        0 {
+               id 1098
+               policy none
+               input.bindings.2 "Input"
+               output.bindings.2 "Output"
+          }
+        1 {
+               id 1098
+               policy none
+               input.bindings.3 "Input"
+               output.bindings.3 "Output"
+          }
+        2 {
+               id 9001
+               policy none
+               input.bindings.6 "Input"
+               output.bindings.6 "Output"
+               input { controls [ 2 340 2 ] }    # right mid room mode
+          }
+        3 {
+               id 9001
+               policy none
+               input.bindings.7 "Input"
+               output.bindings.7 "Output"
+               input { controls [ 2 340 2 ] }    # left mid room mode
+          }
+        4 {
+               id 1098
+               policy none
+               input.bindings.4 "Input"
+               output.bindings.4 "Output"
+          }
+        5 {
+               id 1098
+               policy none
+               input.bindings.5 "Input"
+               output.bindings.5 "Output"
+          }
+     }
+}
+pcm.speaker {
+    type plug
+    slave {
+     pcm "t-table"  
+     channels 8
+     rate "unchanged"
+    }
+}
+pcm.t-table  {
+    type route
+    slave {
+     pcm "hw:0,0"
+     channels 8
+    }
+    ttable {
+      0.7   0
+      1.3   0   
+      2.1   1  #left bass
+      3.5   1  #right bass
+      4.2   1  #left tweeter
+      5.6   1  #right tweeter
+      6.0   1  #left mid
+      7.4   1  #right mid
+    }
+}
+
+#pcm.plughw.slave.rate = "unchanged";

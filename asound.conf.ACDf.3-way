@@ -1,0 +1,232 @@
+pcm.!default {
+     type plug
+     slave.pcm filter1
+}
+ctl.!default {
+     type hw
+     card 0
+}
+pcm.TV-in {
+     type plug
+     slave {
+         pcm filter1
+     }
+}
+pcm.TV-inhw {
+     type plug
+     slave {
+         pcm "hw:0,0"
+     }
+}
+pcm.filter1 {
+     type ladspa
+     slave.pcm filter2
+     path "/usr/lib/ladspa"
+     channels 8
+     plugins
+     {
+          0 {
+               label ACDf
+               policy none
+               input.bindings.0 "Input"
+               output.bindings.2 "Output"
+               input { controls [21 1 0 160 0.707] }   # low left LR4 top 1
+          }
+          1 {
+               label ACDf
+               policy none
+               input.bindings.1 "Input"
+               output.bindings.3 "Output"
+               input { controls [21 1 0 160 0.707] }   # low right LR4 top 1
+          }
+          2 {
+               label ACDf
+               policy none
+               input.bindings.0 "Input"
+               output.bindings.4 "Output"
+               input { controls [22 1 0 5000 0.707] }   # high left LR4 bottom 1     
+          }
+          3 {
+               label ACDf        
+               policy none
+               input.bindings.1 "Input"
+               output.bindings.5 "Output"
+               input { controls [22 1 0 5000 0.707] }   # high right LR4 bottom 1
+          }
+          4 {
+               label ACDf
+               policy none
+               input.bindings.0 "Input"
+               output.bindings.0 "Output"
+               input { controls [22 1 0 160 0.707] }   # mid left LR4 bottom 1    
+          }
+          5 {
+               label ACDf        
+               policy none
+               input.bindings.1 "Input"
+               output.bindings.1 "Output"
+               input { controls [22 1 0 160 0.707] }   # mid left LR4 bottom 1
+          }
+          6 {
+               label ACDf
+               policy none
+               input.bindings.0 "Input"
+               output.bindings.6 "Output"
+               input { controls [21 1 0 5000 0.707] }   # mid left LR4 top 1
+          }
+          7 {
+               label ACDf
+               policy none
+               input.bindings.1 "Input"
+               output.bindings.7 "Output"
+               input { controls [21 1 0 5000 0.707] }   # mid right LR4 top 1
+          }
+
+     }
+}
+pcm.filter2 {
+     type ladspa
+     slave.pcm equil1
+     path "/usr/lib/ladspa"
+     channels 8
+     plugins
+     {
+          0 {
+               label ACDf
+               policy none
+               input.bindings.2 "Input"
+               output.bindings.2 "Output"
+               input { controls [21 1 0 160 0.707] }   # low left LR4 top 2
+          }
+          1 {
+               label ACDf
+               policy none
+               input.bindings.3 "Input"
+               output.bindings.3 "Output"
+               input { controls [21 1 0 160 0.707] }   # low right LR4 top 2
+          }
+          2 {
+               label ACDf
+               policy none
+               input.bindings.4 "Input"
+               output.bindings.4 "Output"
+               input { controls [22 1 0 5000 0.707] }   # high left LR4 bottom 2
+          }
+          3 {
+               label ACDf
+               policy none
+               input.bindings.5 "Input"
+               output.bindings.5 "Output"
+               input { controls [22 1 0 5000 0.707] }   # high right LR4 bottom 2
+          }
+          4 {
+               label ACDf
+               policy none
+               input.bindings.6 "Input"
+               output.bindings.6 "Output"
+               input { controls [21 1 0 5000 0.707] }   # mid left LR4 top 2
+          }
+          5 {
+               label ACDf
+               policy none
+               input.bindings.7 "Input"
+               output.bindings.7 "Output"
+               input { controls [21 1 0 5000 0.707] }   # mid right LR4 top 2
+          }
+          6 {
+               label ACDf
+               policy none
+               input.bindings.6 "Input"
+               output.bindings.6 "Output"
+               input { controls [22 1 0 160 0.707] }   # mid left LR4 bottom 2
+          }
+          7 {
+               label ACDf
+               policy none
+               input.bindings.7 "Input"
+               output.bindings.7 "Output"
+               input { controls [22 1 0 160 0.707] }   # mid right LR4 bottom 2
+          }
+
+      }
+}
+pcm.equil1 {
+     type ladspa
+     slave.pcm speaker
+     path "/usr/lib/ladspa"
+     # channels 2
+     plugins
+     {
+        0 {
+               label ACDf
+               policy none
+               input.bindings.6 "Input"
+               output.bindings.6 "Output"
+               input { controls [26 1 -9 2370 4 1 1] }   # shriek left
+          }
+        1 {
+               label ACDf
+               policy none
+               input.bindings.7 "Input"
+               output.bindings.7 "Output"
+               input { controls [26 1 -9 2370 4 1 1] }   # shriek right
+          }
+        2 {
+               label ACDf
+               policy none
+               input.bindings.6 "Input"
+               output.bindings.6 "Output"
+               input { controls [26 1 -2 1750 3 1 1] }   # twinge left
+          }
+        3 {
+               label ACDf
+               policy none
+               input.bindings.7 "Input"
+               output.bindings.7 "Output"
+               input { controls [26 1 -2 1750 3 1 1] }   # twinge right
+          }
+        4 {
+               label ACDf
+               policy none
+               input.bindings.2 "Input"
+               output.bindings.2 "Output"
+               input { controls [26 1 3 25 2 1 1] }   # low left bump
+          }
+        5 {
+               label ACDf
+               policy none
+               input.bindings.3 "Input"
+               output.bindings.3 "Output"
+               input { controls [26 1 3 25 2 1 1] }   # low right bump
+          }
+    }
+} 
+pcm.speaker {
+    type plug
+    slave {
+     pcm "t-table"
+     channels 8
+     rate "unchanged"
+    }
+}
+pcm.t-table {
+    type route
+    slave {
+     pcm "hw:0,0"
+     channels 8
+    }
+    ttable {
+      0.7   0
+      1.3   0
+      2.1   1  #left bass
+      3.5   1  #right bass
+      4.2   1  #left tweeter
+      5.6   1  #right tweeter
+      6.0   1  #left mid
+      7.4   1  #right mid
+    }
+}
+
+pcm.plughw.slave.rate = "unchanged";
+
+

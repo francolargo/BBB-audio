@@ -212,7 +212,6 @@ pcm.equil1 {
               input.bindings.5 "Input"
               output.bindings.5 "Output"
           }
-          
     }
 } 
 pcm.speaker {

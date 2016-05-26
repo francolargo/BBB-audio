@@ -162,28 +162,29 @@ pcm.equil1 {
                policy none
                input.bindings.6 "Input"
                output.bindings.6 "Output"
-               input { controls [26 1 -9 2370 4 1 1] }   # shriek left
+               input { controls [26 1 -5 2725 3 1 1] }   # overdrive left
           }
         1 {
                label ACDf
                policy none
                input.bindings.7 "Input"
                output.bindings.7 "Output"
-               input { controls [26 1 -9 2370 4 1 1] }   # shriek right
+               input { controls [26 1 -5 2725 3 1 1] }   # overdrive right
           }
         2 {
                label ACDf
                policy none
-               input.bindings.6 "Input"
-               output.bindings.6 "Output"
-               input { controls [26 1 -2 1750 3 1 1] }   # twinge left
+               input.bindings.2 "Input"
+               output.bindings.2 "Output"
+               input { controls [26 1 -3 45 3 1 1] }   # low hump left
           }
         3 {
                label ACDf
                policy none
-               input.bindings.7 "Input"
-               output.bindings.7 "Output"
-               input { controls [26 1 -2 1750 3 1 1] }   # twinge right
+               input.bindings.3 "Input"
+               output.bindings.3 "Output"
+               input { controls [26 1 -3 45 3 1 1] }   # low hump right
+
           }
         4 {
                label ACDf

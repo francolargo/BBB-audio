@@ -200,6 +200,19 @@ pcm.equil1 {
                output.bindings.3 "Output"
                input { controls [26 1 3 25 2 1 1] }   # low right bump
           }
+        6 {
+              id 1098
+              policy none
+              input.bindings.4 "Input"
+              output.bindings.4 "Output"
+          }
+        7 {
+              id 1098
+              policy none
+              input.bindings.5 "Input"
+              output.bindings.5 "Output"
+          }
+          
     }
 } 
 pcm.speaker {

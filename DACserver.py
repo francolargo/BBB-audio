@@ -8,13 +8,13 @@ from multiprocessing import Process
 import subprocess
 import smbus
 import os
-mutebus = 0x03  # default mute setting
+mute = 0x03  # default mute setting
 FIR = 0x02  # unmute plus default filter shape
 # The following routines run once to initialize the DAC
 # setup I2C volume, DPLL bandwidth, other es9028 parameters 
 def dacregister(): # enter desired register values for initialization - these are mine
-   bus.write_byte_data(0x48, 0x07, mutebus)  # mute
-   bus.write_byte_data(ox48, 0x01, 0x04) # 00000100 automatically select serial/DSD
+   bus.write_byte_data(0x48, 0x07, mute)  # mute
+   bus.write_byte_data(0x48, 0x01, 0x04) # 00000100 automatically select serial/DSD
    bus.write_byte_data(0x48, 0x02, 0x3c)  # automute off
    bus.write_byte_data(0x48, 0x04, 0x00)  # automute time = 0 = disable automute
    bus.write_byte_data(0x48, 0x05, 0x68) # 01101000 default
@@ -81,7 +81,7 @@ def handle_command(self, line): #commands for remote control go here
         global FIR
         global rate  
         def mute():
-            bus.write_byte_data(0x48, 0x07, mutebus)
+            bus.write_byte_data(0x48, 0x07, mute)
         def unmute():
             bus.write_byte_data(0x48, 0x07, FIR)
         if  line.startswith("set it to"): #volume command = "set it to XXX"
@@ -93,27 +93,27 @@ def handle_command(self, line): #commands for remote control go here
             unmute()
         elif line == 'function1':
             FIR = 0x60
-            mutebus = 0x61
+            mute = 0x61
             bus.write_byte_data(0x48, 0x07, FIR)
         elif line == 'function3':
             FIR = 0x80
-            mutebus = 0x81
+            mute = 0x81
             bus.write_byte_data(0x48, 0x07, FIR)
         elif line == 'function2':
             FIR = 0x40
-            mutebus = 0x41
+            mute = 0x41
             bus.write_byte_data(0x48, 0x07, FIR)
         elif line == 'function4':
             FIR = 0x20
-            mutebus = 0x21
+            mute = 0x21
             bus.write_byte_data(0x48, 0x07, FIR)
         elif line == 'function5':
             FIR = 0x00
-            mutebus = 0x01
+            mute = 0x01
             bus.write_byte_data(0x48, 0x07, FIR)
         elif line == 'function6':
             FIR = 0xe0
-            mutebus = 0xe1
+            mute = 0xe1
             bus.write_byte_data(0x48, 0x07, FIR)
         elif line == 'get freq':
             with open('/proc/asound/Botic/pcm0p/sub0/hw_params') as f:

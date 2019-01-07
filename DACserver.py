@@ -16,7 +16,7 @@ def dacregister(): # enter desired register values for initialization - these ar
    bus.write_byte_data(0x48, 0x07, mutebus)  # mute
    bus.write_byte_data(ox48, 0x01, 0x04) # 00000100 automatically select serial/DSD
    bus.write_byte_data(0x48, 0x02, 0x3c)  # automute off
-   #bus.write_byte_data(0x48, 0x04, 0xff)  # automute time = 255
+   bus.write_byte_data(0x48, 0x04, 0x00)  # automute time = 0 = disable automute
    bus.write_byte_data(0x48, 0x05, 0x68) # 01101000 default
    bus.write_byte_data(0x48, 0x06, 0x4a) # 01001010 default
    #bus.write_byte_data(0x48, 0x07, 0x02) # 50k@44.1 00000010 for reference - would unmute if executed here

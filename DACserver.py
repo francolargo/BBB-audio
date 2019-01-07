@@ -22,7 +22,7 @@ def dacregister(): # enter desired register values for initialization - these ar
    #bus.write_byte_data(0x48, 0x07, 0x02) # 50k@44.1 00000010 for reference - would unmute if executed here
    bus.write_byte_data(0x48, 0x08, 0x80) # automute status 10000000
    bus.write_byte_data(0x48, 0x09, 0x18) # lock status 00011000
-   bus.write_byte_data(0x48, 0x0a, 0x10) # 128fs enabled 00001000
+   bus.write_byte_data(0x48, 0x0a, 0x10) # 128fs enabled 00010000
    bus.write_byte_data(0x48, 0x0c, 0x5a) # default 01010101
    bus.write_byte_data(0x48, 0x0d, 0x20) # enable (default) 00100000
    bus.write_byte_data(0x48, 0x0e, 0x8a) # default 10001010

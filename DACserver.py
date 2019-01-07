@@ -12,7 +12,7 @@ mutebus = 0x61  # default mute setting
 FIR = 0x60  # unmute plus default filter shape
 # The following routines run once to initialize the DAC
 # setup I2C volume, DPLL bandwidth, other es9028 parameters 
-def dacregister(): # enter desired register values for initialization
+def dacregister(): # enter desired register values for initialization - these are mine
    bus.write_byte_data(0x48, 0x07, mutebus)  # mute
    bus.write_byte_data(0x48, 0x02, 0xfc)  # automute on
    bus.write_byte_data(0x48, 0x04, 0xff)  # automute time = 255

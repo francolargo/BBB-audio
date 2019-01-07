@@ -26,8 +26,8 @@ def dacregister(): # enter desired register values for initialization - these ar
    bus.write_byte_data(0x48, 0x0c, 0x5a) # default 01010101
    bus.write_byte_data(0x48, 0x0d, 0x20) # enable (default) 00100000
    bus.write_byte_data(0x48, 0x0e, 0x8a) # default 10001010
-   bus.write_byte_data(0x48, 0x0f, 0x0f)  # use stereo mode, channel 1 and latch volume
-   bus.write_byte_data(0x48, 0x10, 0x00) #volume individual registers - no attenuation
+   bus.write_byte_data(0x48, 0x0f, 0x0f) # use stereo mode, channel 1 and latch volume
+   bus.write_byte_data(0x48, 0x10, 0x00) # individual volume registers - no attenuation
    bus.write_byte_data(0x48, 0x11, 0x00)
    bus.write_byte_data(0x48, 0x12, 0x00)
    bus.write_byte_data(0x48, 0x13, 0x00)
@@ -40,7 +40,7 @@ def dacregister(): # enter desired register values for initialization - these ar
    bus.write_byte_data(0x48, 0x1a, 0xff)
    bus.write_byte_data(0x48, 0x1b, 0x7f)
    bus.write_byte_data(0x48, 0x25, 0x80) # OSF disabled 10000000
-   #bus.write_byte_data(0x48, 0x26, 0d10) # default 00010000 - All Ch 1 = 0d00; All Ch 2 = 0d11
+   #bus.write_byte_data(0x48, 0x26, 0d10) # CHECK THIS! All Ch 1 = 0d00?; All Ch 2 = 0d11?
    bus.write_byte_data(0x48, 0x07, FIR)   # unmute
 def mayday(): #this function is optional
    #print "mayday called"

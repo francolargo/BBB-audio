@@ -139,15 +139,10 @@ def police():
    while True:
       try:
          DACok = bus.read_byte_data(0x48, 0x0f)  # in stereo mode?
-         bus.write_byte_data(0x70, 0x40, 0x05)  # tweeter address
-         tweetok = bus.read_byte_data(0x48, 0x0f)  # in stereo mode?
-         bus.write_byte_data(0x70, 0x40, 0x04)  # woofer address
-         woofok = bus.read_byte_data(0x48, 0x0f)  # in stereo mode?
       except IOError as err:
-         os.system("killall -9 squeezelite")
-         os.system("killall -9 sox")         
-         print "reset ran from point 1"
-         reset()
+         #os.system("killall -9 squeezelite")
+         #os.system("killall -9 sox")         
+         print "reset ran from police"
       if DACok != 0x07:
          mayday()
       time.sleep(.3)
@@ -158,7 +153,6 @@ def netio():
         for obj, flags in evt:
             readwrite(obj, flags)
 class EPoll(object):
-    # print "chekpoint 3"
     def __init__(self):
         self.epoll = select.epoll()
         self.fdmap = {}
@@ -171,7 +165,6 @@ class EPoll(object):
         del self.fdmap[fd]
         self.epoll.unregister(fd)
     def poll(self):
-        # print "checkpoint 8"
         evt = self.epoll.poll()
         for fd, flags in evt:
             yield self.fdmap[fd], flags
@@ -184,8 +177,8 @@ if __name__ == "__main__":
     #pollster.register(Server(("",8193),pollster), select.EPOLLIN) #F iPhoneX
     #pollster.register(Server(("",8194),pollster), select.EPOLLIN) #front panel
     #pollster.register(Server(("",8195),pollster), select.EPOLLIN) #iPad New
-    p1 = Process(target = police)
+    p1 = Process(target = netio)
     p1.start()
-    p2 = Process(target = netio)
-    p2.start()
+    #p2 = Process(target = police)
+    #p2.start()
 

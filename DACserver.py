@@ -8,18 +8,40 @@ from multiprocessing import Process
 import subprocess
 import smbus
 import os
-mutebus = 0x61  # default mute setting
-FIR = 0x60  # unmute plus default filter shape
+mutebus = 0x03  # default mute setting
+FIR = 0x02  # unmute plus default filter shape
 # The following routines run once to initialize the DAC
 # setup I2C volume, DPLL bandwidth, other es9028 parameters 
 def dacregister(): # enter desired register values for initialization - these are mine
    bus.write_byte_data(0x48, 0x07, mutebus)  # mute
-   bus.write_byte_data(0x48, 0x02, 0xfc)  # automute on
-   bus.write_byte_data(0x48, 0x04, 0xff)  # automute time = 255
-   bus.write_byte_data(0x48, 0x05, 96)    # automute level
-   bus.write_byte_data(0x48, 0x0c, 0x1a)  # DPLL = lowest bandwidth for I2S, 10 for DSD
-   bus.write_byte_data(0x48, 0x0f, 0x07)  # use stereo mode, channel 1 and latch volume
-   bus.write_byte_data(0x48, 0x07, FIR)   # unmute, FIR filter normal, slow rolloff; fast rolloff = 40
+   bus.write_byte_data(ox48, 0x01, 0x04) # 00000100 automatically select serial/DSD
+   bus.write_byte_data(0x48, 0x02, 0x3c)  # automute off
+   #bus.write_byte_data(0x48, 0x04, 0xff)  # automute time = 255
+   bus.write_byte_data(0x48, 0x05, 0x68) # 01101000 default
+   bus.write_byte_data(0x48, 0x06, 0x4a) # 01001010 default
+   bus.write_byte_data(0x48, 0x07, 0x02) # 50k@44.1 00000010
+   bus.write_byte_data(0x48, 0x08, 0x80) # automute status 10000000
+   bus.write_byte_data(0x48, 0x09, 0x18) # lock status 00011000
+   bus.write_byte_data(0x48, 0x0a, 0x08) # 128fs enabled 00001000
+   bus.write_byte_data(0x48, 0x0c, 0x5a) # default 01010101
+   bus.write_byte_data(0x48, 0x0d, 0x20) # enable (default) 00100000
+   bus.write_byte_data(0x48, 0x0e, 0x8a) # default 10001010
+   bus.write_byte_data(0x48, 0x0f, 0x0f)  # use stereo mode, channel 1 and latch volume
+   bus.write_byte_data(0x48, 0x10, 0x00) #volume individual registers - no attenuation
+   bus.write_byte_data(0x48, 0x11, 0x00)
+   bus.write_byte_data(0x48, 0x12, 0x00)
+   bus.write_byte_data(0x48, 0x13, 0x00)
+   bus.write_byte_data(0x48, 0x14, 0x00)
+   bus.write_byte_data(0x48, 0x15, 0x00)
+   bus.write_byte_data(0x48, 0x16, 0x00)
+   bus.write_byte_data(0x48, 0x17, 0x00)
+   bus.write_byte_data(0x48, 0x18, 0xff) # Master volume - no attenuation
+   bus.write_byte_data(0x48, 0x19, 0xff)
+   bus.write_byte_data(0x48, 0x1a, 0xff)
+   bus.write_byte_data(0x48, 0x1b, 0x7f)
+   bus.write_byte_data(0x48, 0x25, 0x80) # OSF disabled 10000000
+   #bus.write_byte_data(0x48, 0x26, 0d10) # default 00010000 - All Ch 1 = 0d00; All Ch 2 = 0d11
+   bus.write_byte_data(0x48, 0x07, FIR)   # unmute
 def mayday(): #this function is optional
    #print "mayday called"
    try:

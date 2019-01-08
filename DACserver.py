@@ -13,7 +13,7 @@ mute = 0x03  # default mute setting
 FIR = 0x02  # unmute plus default filter shape
 # The following routines run once to initialize the DAC
 # setup I2C volume, DPLL bandwidth, other es9028 parameters 
-def dacregister(): # enter desired register values for initialization - these are mine
+def dacregister(): # I believe these are twluke's desired register settings
    bus.write_byte_data(0x48, 0x07, mute)  # mute
    bus.write_byte_data(0x48, 0x01, 0x04) # 00000100 automatically select serial/DSD
    bus.write_byte_data(0x48, 0x02, 0x3c)  # automute off

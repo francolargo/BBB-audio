@@ -78,9 +78,10 @@ class Client(asyncore.dispatcher_with_send):
         self.data = receivedData
 
 def handle_command(self, line): #commands for remote control go here
-        global mutebus
+        global mute
         global FIR
-        global rate  
+        global rate
+        global volume
         def mute():
             bus.write_byte_data(0x48, 0x07, mute)
         def unmute():

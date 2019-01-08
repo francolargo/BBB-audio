@@ -7,7 +7,7 @@ import time
 from multiprocessing import Process 
 import subprocess
 import smbus
-# import os
+import os
 bus = smbus.SMBus(1)
 mute = 0x03  # default mute setting
 FIR = 0x02  # unmute plus default filter shape

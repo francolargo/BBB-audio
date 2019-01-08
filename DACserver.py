@@ -125,6 +125,9 @@ def handle_command(self, line): #commands for remote control go here
                  except IndexError:
                      rate = 0
             print(rate)
+        else:
+            self.send('unknown command\n')
+            print 'Unknown command:', line
 
 class Server(asyncore.dispatcher):
     def __init__(self, listen_to, pollster):

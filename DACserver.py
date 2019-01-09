@@ -96,10 +96,14 @@ class Client(asyncore.dispatcher_with_send):
         if  line == '+':
             Volm = bus.read_byte_data(0x48, 0x1b)    # read volume
             volume = Volm + 10                       # add 10 to volume setting
+            if volume > 127:
+                volume = 127
             bus.write_byte_data(0x48, 0x1b, volume)
         if  line == '-':
             Volm = bus.read_byte_data(0x48, 0x1b)    # read volume
             volume = Volm - 10                       # minus 10 from volume setting
+            if volume < 0:
+                volume = 0
             bus.write_byte_data(0x48, 0x1b, volume)
         elif 'slow-min'in line:
             FIR = 0x62

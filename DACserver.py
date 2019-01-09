@@ -194,7 +194,9 @@ def readwrite(obj, flags):
 def police():
    while True:
 #      if kill == 1:
+#         bus.write_byte_data(0x48, 0x1b, volume) # restore volume to previous setting
 #         os.system("nice -n -19 squeezelite -z -C 1 -o plug:filter1 -a 8192:2048::0")  # restart the source
+#         time.sleep(.5)
 #         kill = 0
       try:
          DACok = bus.read_byte_data(0x48, 0x0f)  # in stereo mode?

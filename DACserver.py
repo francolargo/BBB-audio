@@ -17,7 +17,7 @@ FIR = 0x02  # default filter shape
 #deemph = 0x40
 #softeq = 3  # was 255 for eq button
 # setup I2C volume, DPLL bandwidth, other es9028 parameters 
-def dacregister(): # enter desired register values for initialization - these are mine
+def dacregister(): # enter desired register values for initialization - these are twluke's
     bus.write_byte_data(0x48, 0x07, mute)  # mute
     bus.write_byte_data(0x48, 0x01, 0x04) # 00000100 automatically select serial/DSD
     bus.write_byte_data(0x48, 0x02, 0x3c)  # automute off

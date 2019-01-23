@@ -75,6 +75,7 @@ class Client(asyncore.dispatcher_with_send):
         self.data = receivedData
 
     def handle_command(self, line):
+        # 'global' variables can be read outside of the 'handle_command' function
         global volume
         global mute
         global FIR
@@ -93,13 +94,13 @@ class Client(asyncore.dispatcher_with_send):
 #            print (line)
 #            print (volume)
             bus.write_byte_data(0x48, 0x1b, volume)
-        if  line == '+':
+        elif  line == '+':
             Volm = bus.read_byte_data(0x48, 0x1b)    # read volume
             volume = Volm + 10                       # add 10 to volume setting
             if volume > 127:
                 volume = 127
             bus.write_byte_data(0x48, 0x1b, volume)
-        if  line == '-':
+        elif  line == '-':
             Volm = bus.read_byte_data(0x48, 0x1b)    # read volume
             volume = Volm - 10                       # minus 10 from volume setting
             if volume < 0:

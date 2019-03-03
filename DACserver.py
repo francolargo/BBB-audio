@@ -40,10 +40,10 @@ def dacregister(): # enter desired register values for initialization - these ar
     bus.write_byte_data(0x48, 0x15, 0x00)
     bus.write_byte_data(0x48, 0x16, 0x00)
     bus.write_byte_data(0x48, 0x17, 0x00)
-    bus.write_byte_data(0x48, 0x18, volume) # Master volume - starts low
+    bus.write_byte_data(0x48, 0x18, 0xff) 
     bus.write_byte_data(0x48, 0x19, 0xff)
     bus.write_byte_data(0x48, 0x1a, 0xff)
-    bus.write_byte_data(0x48, 0x1b, 0x7f)
+    bus.write_byte_data(0x48, 0x1b, volume) # Master volume - starts low
     bus.write_byte_data(0x48, 0x25, 0x80) # OSF disabled 10000000
     #bus.write_byte_data(0x48, 0x26, 0d10) # CHECK THIS! All Ch 1 = 0d00 ?; All Ch 2 = 0d11 ?
     bus.write_byte_data(0x48, 0x07, FIR)   # unmute

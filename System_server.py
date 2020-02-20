@@ -23,6 +23,9 @@ GPIO.setup(20, GPIO.OUT) # DAC
 GPIO.output(20, GPIO.LOW)
 GPIO.setup(21, GPIO.OUT) # DAC
 GPIO.output(21, GPIO.LOW)
+#DAC = 0 #DAC asleep
+#speakers = 0  # ie. BBB default output, 0 for headphone out
+#input = 2 #   1=BBB, 2=ATV, 3=STV
 timeout = 3 # TCP socket timeout
 #print "checkpoint 1"
 class Client(asyncore.dispatcher_with_send):
@@ -82,6 +85,7 @@ class Client(asyncore.dispatcher_with_send):
                 print "DAC_start failed"
         elif line == 'speakers': # nc return from netio_server startup
              try:
+
                 GPIO.output(20, GPIO.HIGH)
                 time.sleep(.5)
                 GPIO.output(21, GPIO.HIGH)
@@ -100,27 +104,31 @@ class Client(asyncore.dispatcher_with_send):
              print "shutdown called"
              try:
                 subprocess.call("echo 'initialize\n' | nc -n -q .2 -w 1 192.168.1.53 8194", shell=True)
-                time.sleep(1)
-#                subprocess.call("echo 'shutdown\n' | nc -n -q .2 -w 1 192.168.1.53 8194", shell=True)
+                time.sleep(1.2)
+                subprocess.call("echo 'turnoff\n' | nc -n -q .2 -w 1 192.168.1.53 8194", shell=True)
              except IOError as g:
                 print(g)
 #                print "IOError"
              except socket.error as h:
                 print(h)
 #                print "socket.error"
+#                obj.handle_close
+             time.sleep(1)
              try:
                 GPIO.output(21, GPIO.LOW)
                 time.sleep(.5)
                 GPIO.output(20, GPIO.LOW)
-                time.sleep(12)
+                time.sleep(6)
                 GPIO.output(26, GPIO.LOW)
-                time.sleep(5)
+                time.sleep(1)
              except IOError as d:
                 print(d)
 #                print "GPIO error"
              except socket.error as c:
                 print(c)
+#               print "socket.error"
 #                obj.handle_close
+#             GPIO.cleanup()
         else:
              self.send('unknown command\n')
              print 'Unknown command:', line
@@ -158,6 +166,7 @@ def readwrite(obj, flags):
         raise
     except:
         obj.handle_error()
+
 
 class EPoll(object):
     def __init__(self):
